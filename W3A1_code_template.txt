@@ -1,0 +1,19 @@
+libname mydata '/home/stefaniegreay';
+
+data mydata.w3grades;
+set work.import;
+run;
+
+proc print data=mydata.w3grades(obs=5);
+run;
+
+proc contents data=mydata.w3grades;
+run;
+
+proc freq data=mydata.w3grades;
+tables _CHAR_;
+run;
+
+proc univariate data=mydata.w3grades plots;
+histogram;
+run;

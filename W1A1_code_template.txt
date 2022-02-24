@@ -1,0 +1,9 @@
+libname mydata '/home/stefaniegreay/';
+
+data mydata.W1_WaitTimes;
+set work.import;
+run;
+
+proc univariate data=mydata.W1_WaitTimes;
+histogram VAR1;
+run;

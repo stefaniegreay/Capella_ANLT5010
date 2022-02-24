@@ -1,0 +1,19 @@
+libname mydata '/home/stefaniegreay/';
+
+data mydata.airbnb;
+set work.import;
+run;
+
+proc print data=mydata.airbnb(obs=5);
+run;
+
+proc contents data=mydata.airbnb;
+run;
+
+proc freq data=mydata.airbnb;
+tables _CHAR_;
+run;
+
+proc univariate data=mydata.airbnb plots;
+histogram;
+run;

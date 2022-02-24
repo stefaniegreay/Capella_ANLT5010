@@ -1,0 +1,12 @@
+libname mydata '/home/stefaniegreay/';
+
+data mydata.W_InvDaA;
+set work.import;
+run;
+
+proc univariate data=mydata.W2_invdaa;
+histogram;
+run;
+
+proc corr data=mydata.w2_invdaa;
+run;

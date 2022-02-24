@@ -1,0 +1,25 @@
+libname mydata '/home/stefaniegreay/';
+
+data mydata.sales;
+set work.import;
+run;
+
+proc contents data=mydata.sales;
+run;
+
+proc univariate data=mydata.sales cibasic;
+var Sales;
+by Store;
+run;
+
+ods graphics on;
+proc ttest data=mydata.sales h0=4900 sides=U;
+   var Sales;
+   by Store;
+run;
+
+proc ttest data=mydata.sales sides=L;
+class Store;
+var Sales;
+run;
+ods graphics off;

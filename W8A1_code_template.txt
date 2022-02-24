@@ -1,0 +1,65 @@
+LIBNAME mydata '/home/stefaniegreay';
+
+data mydata.HeightShoeSize_W8_A1;
+set work.import;
+run;
+
+proc corr data=mydata.heightshoesize_w8_a1;
+run;
+
+
+proc surveyselect data=mydata.heightshoesize_w8_a1 seed=12345 out=mydata.ssout
+     groups=(166666, 166667, 166667);
+run;
+
+data mydata.w8a1train;
+set mydata.ssout;
+where GroupID=1;
+run;
+
+/*** An alternate to splitting into train, validate, and test is to take a random sample to build the 
+model based on.  This can be done through the code below.  Adjust the number next to n= to adjust the
+size of the random sample selected. ****/
+/*
+proc surveyselect data=mydata.heightshoesize_w8_a1 method=srs n=1000
+                  out=mydata.w8a1train;
+run;
+*/
+
+
+proc univariate data=mydata.w8a1train normal plots;
+var 'Shoe Size'n Height;
+histogram;
+run;
+
+ods graphics on;
+
+proc reg data=mydata.w8a1train plots=all;
+model 'Shoe Size'n = Height / stb clb partial pcorr2 SCORR2(TESTS) dw;
+output out=stdres predicted=predict residual=resid rstudent=r h=lev cookd=cookd dffits=dffit;
+run;
+
+ods graphics off; 
+
+proc univariate data=stdres normal plots;
+var resid;
+histogram;
+run;
+
+
+proc print data= stdres;
+var 'Shoe Size'n Height;
+where abs(r)>=3;
+run;
+
+
+/*** This not required for this assignment, but if you did wish to "test" your model
+on the entire dataset, you could do so by finding the "Parameter Estimates" section of the proc reg output, and creating the y=mx+b format of the equation by putting the intercept "Parameter Estimate" as b and the Height "Parameter Estimate" as m, and using a data step to calculate the predicted value given your model.  There are more streamlined programmatic ways to do this, of course, but for simplicity's sake, it is explained manually here.  for example, if the parameter estimates are -6.03645 for the intercept and 0.23586 for Height, the equation would be y=0.23586x-6.03645, and the data step to fit this model on the data would look like this:
+
+data mydata.fullfitted;
+set mydata.HeightShoeSize_W8_A1;
+predicted = 0.23586*Height - 6.03645;
+residual = 'Shoe Size'n - predicted;
+run;
+
+This data step would fit the model on all of the observations to calculate the predicted shoe size, and then find how far off from the actual shoe size the prediction was by calculating the residual.  ***/
